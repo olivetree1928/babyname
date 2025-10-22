@@ -67,6 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    // 清除本地存储并刷新页面以确保完全退出
+    localStorage.removeItem('supabase.auth.token');
+    window.location.reload();
   };
 
   return (
