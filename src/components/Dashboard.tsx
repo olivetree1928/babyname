@@ -33,8 +33,8 @@ export function Dashboard() {
     const bazi = calculateBazi(birthDateTime);
     setBaziInfo(bazi);
     
-    // 每次生成时使用随机种子确保结果不同
-    const randomSeed = Math.floor(Math.random() * 10000);
+    // 每次生成时使用当前时间戳+随机数作为种子，确保每次点击都生成不同结果
+    const randomSeed = Math.floor(Math.random() * 10000) + Date.now() % 10000;
     
     // 生成男生名字
     const maleBaziNames = generateNames(bazi, 'male', lastName, nameLength, 5, randomSeed).map(item => ({
@@ -43,7 +43,9 @@ export function Dashboard() {
       source: '生辰八字分析（男）'
     }));
     
-    const maleStyleNames = generateNamesForStyle(selectedStyle, birthDateTime, lastName, nameLength);
+    // 使用不同的随机种子生成风格名字
+    const maleStyleSeed = randomSeed + 100;
+    const maleStyleNames = generateNamesForStyle(selectedStyle, birthDateTime, lastName, nameLength, maleStyleSeed, 'male');
     const maleNames = [...maleBaziNames, ...maleStyleNames.slice(0, 5)];
     setGeneratedMaleNames(maleNames);
     
@@ -54,7 +56,9 @@ export function Dashboard() {
       source: '生辰八字分析（女）'
     }));
     
-    const femaleStyleNames = generateNamesForStyle(selectedStyle, birthDateTime, lastName, nameLength);
+    // 使用不同的随机种子生成风格名字
+    const femaleStyleSeed = randomSeed + 200;
+    const femaleStyleNames = generateNamesForStyle(selectedStyle, birthDateTime, lastName, nameLength, femaleStyleSeed, 'female');
     const femaleNames = [...femaleBaziNames, ...femaleStyleNames.slice(0, 5)];
     setGeneratedFemaleNames(femaleNames);
     

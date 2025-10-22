@@ -490,27 +490,53 @@ export function generateNamesForStyle(
   styleId: string,
   birthDateTime: Date,
   lastName: string = '',
-  nameLength: number = 2
+  nameLength: number = 2,
+  randomSeed: number = 0,
+  gender: 'male' | 'female' = 'male'
 ): GeneratedName[] {
   const baseNames = nameDatabase[styleId] || [];
   const singleNames = singleCharNameDatabase[styleId] || [];
 
-  const hour = birthDateTime.getHours();
-  const minute = birthDateTime.getMinutes();
-  const second = birthDateTime.getSeconds();
-
+  // 使用随机种子或时间生成索引
+  const seed = randomSeed || (birthDateTime.getHours() * 3600 + birthDateTime.getMinutes() * 60 + birthDateTime.getSeconds());
+  
   // 格式化姓氏，确保非空
   const formattedLastName = lastName.trim() || '';
 
   // 根据名字长度生成不同的结果
   if (nameLength === 1) {
     // 生成单字名
-    const timeIndex = (hour * 3600 + minute * 60 + second) % singleNames.length;
+    const timeIndex = seed % singleNames.length;
+    
+    // 根据性别筛选适合的字
+    // 男性名字倾向于阳刚、坚强、稳重的字
+    // 女性名字倾向于优雅、柔美、灵动的字
+    const filteredNames = singleNames.filter(name => {
+      const char = name.name;
+      const meaning = name.meaning || '';
+      
+      if (gender === 'male') {
+        // 男性名字特征
+        return !(meaning.includes('柔') || meaning.includes('美') || meaning.includes('娇') || 
+                meaning.includes('婉') || meaning.includes('嫣') || meaning.includes('娜') ||
+                char.includes('娇') || char.includes('婉') || char.includes('媛') || 
+                char.includes('嫣') || char.includes('婷') || char.includes('姿'));
+      } else {
+        // 女性名字特征
+        return !(meaning.includes('刚') || meaning.includes('猛') || meaning.includes('壮') || 
+                meaning.includes('威') || meaning.includes('武') || meaning.includes('霸') ||
+                char.includes('刚') || char.includes('壮') || char.includes('武') || 
+                char.includes('威') || char.includes('霸') || char.includes('强'));
+      }
+    });
+    
+    // 如果过滤后没有足够的名字，使用原始列表
+    const namesToUse = filteredNames.length >= 3 ? filteredNames : singleNames;
     
     const selectedNames = [
-      singleNames[timeIndex],
-      singleNames[(timeIndex + 1) % singleNames.length],
-      singleNames[(timeIndex + 2) % singleNames.length],
+      namesToUse[timeIndex % namesToUse.length],
+      namesToUse[(timeIndex + 1) % namesToUse.length],
+      namesToUse[(timeIndex + 2) % namesToUse.length],
     ].map(singleChar => ({
       name: formattedLastName + singleChar.name,
       meaning: singleChar.meaning || `${styleId === 'guoxue' ? '国学' : 
@@ -529,12 +555,35 @@ export function generateNamesForStyle(
     return selectedNames;
   } else {
     // 生成双字名
-    const timeIndex = (hour * 3600 + minute * 60 + second) % baseNames.length;
+    const timeIndex = seed % baseNames.length;
+    
+    // 根据性别筛选适合的名字
+    const filteredNames = baseNames.filter(name => {
+      const fullName = name.name;
+      const meaning = name.meaning || '';
+      
+      if (gender === 'male') {
+        // 男性名字特征
+        return !(meaning.includes('柔') || meaning.includes('美') || meaning.includes('娇') || 
+                meaning.includes('婉') || meaning.includes('嫣') || meaning.includes('娜') ||
+                fullName.includes('娇') || fullName.includes('婉') || fullName.includes('媛') || 
+                fullName.includes('嫣') || fullName.includes('婷') || fullName.includes('姿'));
+      } else {
+        // 女性名字特征
+        return !(meaning.includes('刚') || meaning.includes('猛') || meaning.includes('壮') || 
+                meaning.includes('威') || meaning.includes('武') || meaning.includes('霸') ||
+                fullName.includes('刚') || fullName.includes('壮') || fullName.includes('武') || 
+                fullName.includes('威') || fullName.includes('霸') || fullName.includes('强'));
+      }
+    });
+    
+    // 如果过滤后没有足够的名字，使用原始列表
+    const namesToUse = filteredNames.length >= 3 ? filteredNames : baseNames;
     
     const selectedNames = [
-      baseNames[timeIndex],
-      baseNames[(timeIndex + 1) % baseNames.length],
-      baseNames[(timeIndex + 2) % baseNames.length],
+      namesToUse[timeIndex % namesToUse.length],
+      namesToUse[(timeIndex + 1) % namesToUse.length],
+      namesToUse[(timeIndex + 2) % namesToUse.length],
     ].map(nameObj => ({
       ...nameObj,
       name: formattedLastName + nameObj.name  // 在名字前加上姓氏
