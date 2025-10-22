@@ -16,7 +16,7 @@ export function Auth() {
     setLoading(true);
 
     // For testing purposes - bypass authentication
-    if (email === 'test@example.com' && password === 'password') {
+    if (email === 'user@babyname.life' && password === 'password') {
       console.log('使用测试账号登录');
       // Simulate successful login
       localStorage.setItem('supabase.auth.token', JSON.stringify({
@@ -25,7 +25,7 @@ export function Auth() {
         refresh_token: 'test-refresh-token',
         user: {
           id: 'test-user-id',
-          email: 'test@example.com',
+          email: 'user@babyname.life',
           app_metadata: {
             provider: 'email'
           },
@@ -70,7 +70,7 @@ export function Auth() {
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
               <p className="text-sm text-blue-800 font-medium">测试账号</p>
-              <p className="text-xs text-blue-600 mt-1">邮箱: test@example.com</p>
+              <p className="text-xs text-blue-600 mt-1">邮箱: user@babyname.life</p>
               <p className="text-xs text-blue-600">密码: ******</p>
             </div>
 
